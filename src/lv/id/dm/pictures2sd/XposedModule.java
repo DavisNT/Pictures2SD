@@ -29,6 +29,7 @@ public class XposedModule implements IXposedHookLoadPackage {
 					Log.e(LogTag, "Secondary storage not found (environment variable SECONDARY_STORAGE not set)");
 					return;
 				}
+				extSD = extSD.split(":", 2)[0];
 				File fileExtSD = new File(extSD);
 				Log.d(LogTag, String.format("getExternalStorageDirectory() will return %s", fileExtSD.toString()));
 				param.setResult(fileExtSD);
@@ -43,20 +44,12 @@ public class XposedModule implements IXposedHookLoadPackage {
 					Log.e(LogTag, "Secondary storage not found (environment variable SECONDARY_STORAGE not set)");
 					return;
 				}
+				extSD = extSD.split(":", 2)[0];
 				File fileExtSD = new File(new File(extSD), (String)param.args[0]);
 				Log.d(LogTag, String.format("getExternalStoragePublicDirectory(\"%s\") will return %s", param.args[0], fileExtSD.toString()));
 				param.setResult(fileExtSD);
 			}
 		});
-
-		
-/*		if(XposedHelpers.findClass("com.android.camera.Storage", lpparam.classLoader)!=null) {
-			XposedBridge.hookAllConstructors()
-			XposedBridge.log("Camera package: "+lpparam.packageName);
-		}
-		if(!"com.android.mms".equals(lpparam.packageName))
-            return;*/
-		// TODO Auto-generated method stub
 		
 	}
 }
