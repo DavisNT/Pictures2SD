@@ -11,7 +11,7 @@ import de.robv.android.xposed.XposedHelpers;
 import de.robv.android.xposed.callbacks.XC_LoadPackage.LoadPackageParam;
 
 public class XposedModule implements IXposedHookLoadPackage {
-	private static final String[] patchablePackages = new String[] {"com.android.gallery3d", "com.google.android.gallery3d", "com.android.camera2", "com.google.android.GoogleCamera", "org.cyanogenmod.focal", "fr.xplod.focal", "com.niksoftware.snapseed"};
+	private static final String[] patchablePackages = new String[] {"com.android.gallery3d", "com.google.android.gallery3d", "com.android.camera2", "com.google.android.GoogleCamera", "org.cyanogenmod.focal", "fr.xplod.focal", "com.niksoftware.snapseed", "com.instagram.android", "com.moblynx.camerakk"};
 	private static final String LogTag = "Pictures2SD";
 	
 	@Override
