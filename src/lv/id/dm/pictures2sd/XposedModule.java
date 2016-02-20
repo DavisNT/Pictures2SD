@@ -21,35 +21,30 @@ public class XposedModule implements IXposedHookLoadPackage {
 		}
 		Log.i(LogTag, String.format("Loaded camera package %s", lpparam.packageName));
 
-		XposedHelpers.findAndHookMethod("android.os.Environment", lpparam.classLoader, "getExternalStorageDirectory", new XC_MethodHook() {
-			@Override
-			protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-				String extSD = System.getenv("SECONDARY_STORAGE");
-				if(extSD==null || "".equals(extSD)) {
-					Log.e(LogTag, "Secondary storage not found (environment variable SECONDARY_STORAGE not set)");
-					return;
-				}
-				extSD = extSD.split(":", 2)[0];
-				File fileExtSD = new File(extSD);
-				Log.d(LogTag, String.format("getExternalStorageDirectory() will return %s", fileExtSD.toString()));
-				param.setResult(fileExtSD);
-			}
-		});
+		XposedHelpers.findAndHookMethod("android.os.Environment", lpparam.classLoader, "getExternalStorageDirectory", new ExternalStorageDirectoryHook());
+		XposedHelpers.findAndHookMethod("android.os.Environment", lpparam.classLoader, "getExternalStoragePublicDirectory", String.class, new ExternalStorageDirectoryHook());		
+	}
 
-		XposedHelpers.findAndHookMethod("android.os.Environment", lpparam.classLoader, "getExternalStoragePublicDirectory", String.class, new XC_MethodHook() {
-			@Override
-			protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-				String extSD = System.getenv("SECONDARY_STORAGE");
-				if(extSD==null || "".equals(extSD)) {
-					Log.e(LogTag, "Secondary storage not found (environment variable SECONDARY_STORAGE not set)");
-					return;
-				}
+	class ExternalStorageDirectoryHook extends XC_MethodHook {
+		@Override
+		protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+			String extSD = System.getenv("SECONDARY_STORAGE");
+			File fileExtSD;
+	
+			if(extSD==null || "".equals(extSD)) {
+				Log.e(LogTag, "Secondary storage not found (environment variable SECONDARY_STORAGE not set)");
+				return;
+			} else {
 				extSD = extSD.split(":", 2)[0];
-				File fileExtSD = new File(new File(extSD), (String)param.args[0]);
-				Log.d(LogTag, String.format("getExternalStoragePublicDirectory(\"%s\") will return %s", param.args[0], fileExtSD.toString()));
-				param.setResult(fileExtSD);
 			}
-		});
-		
+			if(param.args.length == 0){
+				fileExtSD = new File(extSD);
+				Log.i(LogTag, String.format("getExternalStorageDirectory() will return %s", fileExtSD.toString()));
+			} else {
+				fileExtSD = new File(new File(extSD), (String)param.args[0]);
+				Log.i(LogTag, String.format("getExternalStoragePublicDirectory(\"%s\") will return %s", param.args[0], fileExtSD.toString()));
+			}
+			param.setResult(fileExtSD);
+		}	
 	}
 }
